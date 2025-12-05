@@ -15,3 +15,8 @@ data/
 # Fresh build
 _fresh/
 /node_modules/
+logs/20251205-1718-backend.log
+logs/20251205-1718-frontend.log
+logs/20251205-1804-backend.log
+logs/20251205-1804-frontend.log
+logs/frontend-restart.log

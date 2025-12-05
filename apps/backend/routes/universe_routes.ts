@@ -17,6 +17,11 @@ export function createUniverseRoutes(
   llm: LLMPort,
 ) {
   return {
+    async listUniverses(c: Context) {
+      const universes = await db.listUniverses();
+      return c.json(universes);
+    },
+
     async getUniverse(c: Context) {
       const univId = c.req.param("univId");
       const parsed = UniverseIdSchema.safeParse(univId);
@@ -25,13 +30,25 @@ export function createUniverseRoutes(
         return c.json({ error: "Invalid universe ID" }, 400);
       }
 
-      const universe = await db.get(["universe", univId]);
+      const universe = await db.getUniverse(univId);
 
       if (!universe) {
         return c.json({ error: "Universe not found" }, 404);
       }
 
       return c.json(universe);
+    },
+
+    async listCharacters(c: Context) {
+      const univId = c.req.param("univId");
+      const parsed = UniverseIdSchema.safeParse(univId);
+
+      if (!parsed.success) {
+        return c.json({ error: "Invalid universe ID" }, 400);
+      }
+
+      const characters = await db.listCharactersByUniverse(univId);
+      return c.json(characters);
     },
 
     async listConversations(c: Context) {
@@ -42,11 +59,17 @@ export function createUniverseRoutes(
         return c.json({ error: "Invalid universe ID" }, 400);
       }
 
-      const conversations = await db.list([
-        "universe",
-        univId,
-        "conversations",
-      ]);
+      const universe = await db.getUniverse(univId);
+      if (!universe) {
+        return c.json({ error: "Universe not found" }, 404);
+      }
+
+      const characters = await db.listCharactersByUniverse(univId);
+      const allConversations = await Promise.all(
+        characters.map((char) => db.listConversationsByCharacter(char.id)),
+      );
+      const conversations = allConversations.flat();
+
       return c.json({ conversations });
     },
 
@@ -70,18 +93,10 @@ export function createUniverseRoutes(
       const conversationId = crypto.randomUUID();
       const now = new Date();
 
-      const conversation = ConversationSchema.parse({
-        id: conversationId,
+      const conversation = await db.createConversation({
         userId: parsed.data.userId,
         characterId: parsed.data.characterId,
-        createdAt: now,
-        lastMessageAt: now,
       });
-
-      await db.set(
-        ["universe", univId, "conversations", conversationId],
-        conversation,
-      );
 
       return c.json(conversation, 201);
     },
@@ -97,12 +112,7 @@ export function createUniverseRoutes(
         return c.json({ error: "Invalid ID" }, 400);
       }
 
-      const conversation = await db.get([
-        "universe",
-        univId,
-        "conversations",
-        convId,
-      ]);
+      const conversation = await db.getConversation(convId);
 
       if (!conversation) {
         return c.json({ error: "Conversation not found" }, 404);
@@ -122,11 +132,7 @@ export function createUniverseRoutes(
         return c.json({ error: "Invalid ID" }, 400);
       }
 
-      const messages = await db.list([
-        "conversation",
-        convId,
-        "messages",
-      ]);
+      const messages = await db.listMessagesByConversation(convId);
 
       return c.json({ messages });
     },
@@ -151,18 +157,11 @@ export function createUniverseRoutes(
         );
       }
 
-      const messageId = crypto.randomUUID();
-      const now = new Date();
-
-      const message = MessageSchema.parse({
-        id: messageId,
+      const message = await db.createMessage({
         conversationId: convId,
         role: parsed.data.role,
         content: parsed.data.content,
-        createdAt: now,
       });
-
-      await db.set(["conversation", convId, "messages", messageId], message);
 
       return c.json(message, 201);
     },
@@ -184,21 +183,11 @@ export function createUniverseRoutes(
         return c.json({ error: "Invalid message data" }, 400);
       }
 
-      const userMessageId = crypto.randomUUID();
-      const now = new Date();
-
-      const userMessage = MessageSchema.parse({
-        id: userMessageId,
+      const userMessage = await db.createMessage({
         conversationId: convId,
         role: "user",
         content: parsed.data.content,
-        createdAt: now,
       });
-
-      await db.set(
-        ["conversation", convId, "messages", userMessageId],
-        userMessage,
-      );
 
       const stream = new ReadableStream({
         async start(controller) {
@@ -209,18 +198,9 @@ export function createUniverseRoutes(
           }
 
           try {
-            const messages = await db.list([
-              "conversation",
-              convId,
-              "messages",
-            ]);
+            const messages = await db.listMessagesByConversation(convId);
 
-            interface StoredMessage {
-              role: string;
-              content: string;
-            }
-
-            const llmMessages = (messages as StoredMessage[]).map((msg) => ({
+            const llmMessages = messages.map((msg) => ({
               role: msg.role === "user"
                 ? "user" as const
                 : "assistant" as const,
@@ -234,22 +214,14 @@ export function createUniverseRoutes(
               sendSSE(JSON.stringify({ content: chunk }));
             }
 
-            const characterMessageId = crypto.randomUUID();
-            const characterMessage = MessageSchema.parse({
-              id: characterMessageId,
+            const characterMessage = await db.createMessage({
               conversationId: convId,
               role: "character",
               content: fullResponse,
-              createdAt: new Date(),
             });
 
-            await db.set(
-              ["conversation", convId, "messages", characterMessageId],
-              characterMessage,
-            );
-
             sendSSE(
-              JSON.stringify({ done: true, messageId: characterMessageId }),
+              JSON.stringify({ done: true, messageId: characterMessage.id }),
             );
             controller.close();
           } catch (error) {

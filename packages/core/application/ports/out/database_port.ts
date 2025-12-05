@@ -3,39 +3,45 @@
  * Implementations should handle persistence (Deno KV, PostgreSQL, etc.).
  */
 
+import type {
+  Character,
+  Conversation,
+  CreateCharacter,
+  CreateConversation,
+  CreateMessage,
+  CreateUniverse,
+  CreateUser,
+  Message,
+  Universe,
+  User,
+} from "../../../domain/mod.ts";
+
 export interface DatabasePort {
-  /**
-   * Get an entity by its key.
-   * Returns null if not found.
-   */
-  get<T>(key: string[]): Promise<T | null>;
+  // User operations
+  createUser(data: CreateUser): Promise<User>;
+  getUser(id: string): Promise<User | null>;
 
-  /**
-   * Set an entity at the given key.
-   * Creates or updates the entity.
-   */
-  set<T>(key: string[], value: T): Promise<void>;
+  // Universe operations
+  createUniverse(data: CreateUniverse): Promise<Universe>;
+  getUniverse(id: string): Promise<Universe | null>;
+  listUniverses(): Promise<Universe[]>;
+  updateUniverse(id: string, updates: Partial<Universe>): Promise<void>;
 
-  /**
-   * Delete an entity by its key.
-   */
-  delete(key: string[]): Promise<void>;
+  // Character operations
+  createCharacter(data: CreateCharacter): Promise<Character>;
+  getCharacter(id: string): Promise<Character | null>;
+  listCharactersByUniverse(universeId: string): Promise<Character[]>;
+  updateCharacter(id: string, updates: Partial<Character>): Promise<void>;
 
-  /**
-   * List entities with a key prefix.
-   * Useful for queries like "all conversations in a universe".
-   */
-  list<T>(prefix: string[]): Promise<T[]>;
+  // Conversation operations
+  createConversation(data: CreateConversation): Promise<Conversation>;
+  getConversation(id: string): Promise<Conversation | null>;
+  listConversationsByUser(userId: string): Promise<Conversation[]>;
+  listConversationsByCharacter(characterId: string): Promise<Conversation[]>;
+  updateConversation(id: string, updates: Partial<Conversation>): Promise<void>;
 
-  /**
-   * Atomic transaction: set multiple keys or fail all.
-   * Used for operations that must succeed or fail together.
-   */
-  atomic(operations: AtomicOperation[]): Promise<void>;
-}
-
-export interface AtomicOperation {
-  readonly type: "set" | "delete";
-  readonly key: string[];
-  readonly value?: unknown;
+  // Message operations
+  createMessage(data: CreateMessage): Promise<Message>;
+  getMessage(id: string): Promise<Message | null>;
+  listMessagesByConversation(conversationId: string): Promise<Message[]>;
 }

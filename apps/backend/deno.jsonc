@@ -1,6 +1,7 @@
 {
   "name": "@talae/backend",
   "version": "0.1.0",
+  "exports": "./main.ts",
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,
@@ -25,6 +26,7 @@
   },
   "tasks": {
     "dev": "deno run --watch --env --allow-net --allow-env --allow-read --allow-write --unstable-kv main.ts",
-    "start": "deno run --env --allow-net --allow-env --allow-read --allow-write --unstable-kv main.ts"
+    "start": "deno run --env --allow-net --allow-env --allow-read --allow-write --unstable-kv main.ts",
+    "seed": "deno run --env --allow-net --allow-env --allow-read --allow-write --unstable-kv seed.ts"
   }
 }
