@@ -1,5 +1,6 @@
 {
   "name": "talae",
+  "exports": "./mod.ts",
   "nodeModulesDir": "manual",
   "workspace": [
     "./packages/core",

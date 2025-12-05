@@ -2,9 +2,14 @@
 
 ## Overview
 
-TALAE is a chat application where users converse with AI-powered characters living in persistent fictional universes. The project follows a **hexagonal architecture** (ports & adapters), ensuring domain logic remains independent of infrastructure. The codebase is organized as a Deno monorepo with three workspace members:
+TALAE is a chat application where users converse with AI-powered characters
+living in persistent fictional universes. The project follows a **hexagonal
+architecture** (ports & adapters), ensuring domain logic remains independent of
+infrastructure. The codebase is organized as a Deno monorepo with three
+workspace members:
 
-1. **Core** (`packages/core/`) — domain entities, ports, and application services
+1. **Core** (`packages/core/`) — domain entities, ports, and application
+   services
 2. **Backend** (`apps/backend/`) — Hono API server with adapters
 3. **Frontend** (`apps/frontend/`) — Fresh 2 web interface with Vite
 
@@ -83,14 +88,17 @@ talae/
 
 - **Entities**: User, Universe, Character, Conversation, Message, Memory
 - **Zod schemas**: Schema-first validation for all domain types
-- **Create schemas**: `CreateUserSchema`, `CreateUniverseSchema`, etc. for mutations
+- **Create schemas**: `CreateUserSchema`, `CreateUniverseSchema`, etc. for
+  mutations
 - **Type inference**: `User = z.infer<typeof UserSchema>`
-- **No infrastructure knowledge**: uses type-level constraints (`satisfies z.ZodType<UserId>`)
+- **No infrastructure knowledge**: uses type-level constraints
+  (`satisfies z.ZodType<UserId>`)
 
 Key domain concepts:
 
 - **Universes**: persistent fictional worlds with their own state and memories
-- **Characters**: entities within universes with availability, current state, and memories
+- **Characters**: entities within universes with availability, current state,
+  and memories
 - **Conversations**: user–character interaction sessions
 - **Messages**: timestamped utterances with role (user/character)
 - **Memory entries**: salience-weighted content with tags for context retrieval
@@ -102,12 +110,14 @@ Key domain concepts:
 Infrastructure contracts as interfaces:
 
 - **DatabasePort**: CRUD operations for all entities
-  - Namespace-scoped methods: `createUser`, `getUniverse`, `listConversations`, etc.
+  - Namespace-scoped methods: `createUser`, `getUniverse`, `listConversations`,
+    etc.
   - Returns domain types validated by Zod schemas
 - **LLMPort**: language model integration
   - `generate(messages, options)`: single completion
   - `generateStream(messages, options)`: streaming responses (AsyncGenerator)
-  - Generic message format: `{ role: "user" | "assistant" | "system", content: string }`
+  - Generic message format:
+    `{ role: "user" | "assistant" | "system", content: string }`
 
 #### Services (`services/`)
 
@@ -140,6 +150,7 @@ GET    /api/universe/:univId/conversations/:convId/stream
 ```
 
 **SSE streaming endpoint** (`/stream`):
+
 - Server-Sent Events for real-time character responses
 - Stores user message
 - Invokes `GenerateResponseService` with streaming
@@ -149,12 +160,14 @@ GET    /api/universe/:univId/conversations/:convId/stream
 #### Adapters
 
 **Persistence** (`adapters/persistence/deno_kv_adapter.ts`):
+
 - Implements `DatabasePort`
 - Uses Deno KV for persistence
 - Key patterns: `["users", userId]`, `["universes", univId]`, etc.
 - Validates all data with Zod schemas on read
 
 **LLM** (`adapters/llm/`):
+
 - **OllamaAdapter**: local Ollama integration (default: `ministral-3:8b`)
   - Implements `LLMPort` with streaming via fetch
   - Handles `exactOptionalPropertyTypes` by conditionally building options
@@ -165,16 +178,19 @@ GET    /api/universe/:univId/conversations/:convId/stream
 ### 4. Frontend (`apps/frontend/`)
 
 **Fresh 2.2 with Vite**:
+
 - File-based routing in `routes/`
 - Server-rendered pages with optional client islands
 - Tailwind CSS via CDN for styling
 
 **Routes**:
+
 - `index.tsx`: landing page with TALAE introduction
 - `universes.tsx`: list of available universes
 - `_app.tsx`: HTML layout wrapper
 
 **Islands** (`islands/ChatInterface.tsx`):
+
 - Client-side interactive component using Preact signals
 - Connects to backend SSE endpoint for streaming responses
 - Displays message history with user/character distinction
@@ -228,7 +244,8 @@ Update UI with streaming text
 4. **Routes** depend on application services and adapters (injected)
 5. **Frontend** calls backend API, never accesses domain directly
 
-**Inversion of control**: `main.ts` creates adapters and injects them into services and routes.
+**Inversion of control**: `main.ts` creates adapters and injects them into
+services and routes.
 
 ---
 
@@ -246,8 +263,10 @@ EnvConfigSchema = z.object({
   OPENAI_API_KEY: z.string().optional(),
   OPENAI_MODEL: z.string().optional().default("gpt-4o-mini"),
   DATABASE_PATH: z.string().optional(),
-  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-})
+  NODE_ENV: z.enum(["development", "production", "test"]).default(
+    "development",
+  ),
+});
 ```
 
 **Committed `.env`** with sensible defaults (no `.env.local` required for dev):
@@ -285,13 +304,16 @@ NODE_ENV=development
 - **Domain** is the center: pure business logic
 - **Application** defines contracts (ports) and orchestrates domain
 - **Adapters** implement ports, isolated from each other
-- **Dependency direction**: always points inward (adapters → application → domain)
+- **Dependency direction**: always points inward (adapters → application →
+  domain)
 
 ### Schema-first validation
 
 - **All external boundaries** validated with Zod
-- **Domain types** derived from schemas: `type User = z.infer<typeof UserSchema>`
-- **Create types** for mutations: `CreateUserSchema = UserSchema.omit({ id: true, createdAt: true })`
+- **Domain types** derived from schemas:
+  `type User = z.infer<typeof UserSchema>`
+- **Create types** for mutations:
+  `CreateUserSchema = UserSchema.omit({ id: true, createdAt: true })`
 - **Runtime safety**: parse at edges, work with typed data internally
 
 ### Command–Query Separation (CQS)
@@ -300,19 +322,21 @@ Enforced in method naming:
 
 - **Commands** (mutate): `createUser`, `updateCharacter`, `storeMessage`
 - **Queries** (read): `getUniverse`, `listConversations`, `findCharacter`
-- **No mixed operations**: a method either changes state OR returns data, not both
+- **No mixed operations**: a method either changes state OR returns data, not
+  both
 
 ### ExplicitCast pattern
 
 Isolated type coercion with justification:
 
 ```typescript
-ExplicitCast.unknown(value)  // Force unknown for dynamic values
-ExplicitCast.from<T>(value).cast()  // Type-safe cast
-ExplicitCast.from<T>(value).dangerousCast<R>()  // Last resort
+ExplicitCast.unknown(value); // Force unknown for dynamic values
+ExplicitCast.from<T>(value).cast(); // Type-safe cast
+ExplicitCast.from<T>(value).dangerousCast<R>(); // Last resort
 ```
 
 Used for:
+
 - JSON.parse results
 - Incremental object construction
 - Integration with untyped APIs
@@ -330,6 +354,7 @@ async function* generateStream(messages): AsyncGenerator<string> {
 ```
 
 Consumed by:
+
 - SSE endpoints (yield to HTTP stream)
 - Services (accumulate and store)
 
@@ -386,12 +411,15 @@ Planned algorithm:
 
 ## Extension points
 
-- **Add new LLM provider**: implement `LLMPort`, add to adapter factory in `main.ts`
+- **Add new LLM provider**: implement `LLMPort`, add to adapter factory in
+  `main.ts`
 - **Add new database**: implement `DatabasePort` (e.g., PostgreSQL, MongoDB)
 - **Add authentication**: wrap routes with middleware, add User context
-- **Add new entity types**: define domain schema, add CRUD to `DatabasePort`, create service
+- **Add new entity types**: define domain schema, add CRUD to `DatabasePort`,
+  create service
 - **Add WebSocket support**: alternative to SSE for bidirectional communication
-- **Add memory search**: implement vector embeddings for semantic memory retrieval
+- **Add memory search**: implement vector embeddings for semantic memory
+  retrieval
 
 ---
 
@@ -404,6 +432,7 @@ Planned algorithm:
 5. **Database**: stored at `data/talae.db` (auto-created on first run)
 
 **Prerequisites**:
+
 - Deno 2.x installed
 - Ollama running locally (or configure OpenAI API key)
 - Ollama model pulled: `ollama pull ministral-3:8b`
@@ -434,20 +463,24 @@ Planned algorithm:
 ### Why hexagonal?
 
 - **Testability**: domain logic isolated, easy to test without infrastructure
-- **Flexibility**: swap databases, LLM providers, or frontends without changing domain
+- **Flexibility**: swap databases, LLM providers, or frontends without changing
+  domain
 - **Clarity**: explicit contracts (ports) show what the application needs
 
 ### Why Zod everywhere?
 
-- **Type safety at boundaries**: validate external input before it enters the system
-- **Single source of truth**: schemas define both runtime validation and TypeScript types
+- **Type safety at boundaries**: validate external input before it enters the
+  system
+- **Single source of truth**: schemas define both runtime validation and
+  TypeScript types
 - **Error messages**: Zod provides clear validation errors for debugging
 
 ### Why Deno KV?
 
 - **Built-in**: no external database setup for development
 - **Persistence**: file-based storage for production readiness
-- **Simple**: key-value model fits our access patterns (get by ID, list by prefix)
+- **Simple**: key-value model fits our access patterns (get by ID, list by
+  prefix)
 
 ### Why Ollama default?
 
@@ -459,7 +492,8 @@ Planned algorithm:
 ### Why Fresh 2 + Vite?
 
 - **Modern DX**: Vite provides fast HMR and excellent TypeScript support
-- **Islands architecture**: server-render by default, hydrate only interactive components
+- **Islands architecture**: server-render by default, hydrate only interactive
+  components
 - **File-based routing**: intuitive organization, automatic code splitting
 - **Fresh 2.2**: latest stable release with improved Vite integration
 

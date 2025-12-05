@@ -10,6 +10,18 @@ export interface AppDependencies {
 export function createApp(deps: AppDependencies) {
   const app = new Hono();
 
+  app.use("/*", async (c, next) => {
+    c.header("Access-Control-Allow-Origin", "*");
+    c.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    c.header("Access-Control-Allow-Headers", "Content-Type");
+
+    if (c.req.method === "OPTIONS") {
+      return c.body(null, 204);
+    }
+
+    await next();
+  });
+
   app.get("/", (c) => {
     return c.json({
       name: "TALAE API",
@@ -24,7 +36,10 @@ export function createApp(deps: AppDependencies) {
 
   const universeRoutes = createUniverseRoutes(deps.db, deps.llm);
 
+  app.get("/api/universes", universeRoutes.listUniverses);
+  app.get("/api/universes/:univId", universeRoutes.getUniverse);
   app.get("/api/universe/:univId", universeRoutes.getUniverse);
+  app.get("/api/universe/:univId/characters", universeRoutes.listCharacters);
   app.get(
     "/api/universe/:univId/conversations",
     universeRoutes.listConversations,

@@ -1,6 +1,7 @@
 {
   "name": "@talae/frontend",
   "version": "0.1.0",
+  "exports": "./main.ts",
   "compilerOptions": {
     "lib": ["dom", "dom.asynciterable", "dom.iterable", "deno.ns"],
     "jsx": "precompile",
