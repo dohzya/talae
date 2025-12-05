@@ -1,0 +1,17 @@
+# Environment
+.env.local
+.env.*.local
+
+# Deno
+.deno/
+coverage/
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+data/
+
+# Fresh build
+_fresh/
+/node_modules/

@@ -1,0 +1,30 @@
+{
+  "name": "talae",
+  "nodeModulesDir": "manual",
+  "workspace": [
+    "./packages/core",
+    "./apps/backend",
+    "./apps/frontend"
+  ],
+  "imports": {
+    "@talae/core": "jsr:@talae/core",
+    "@talae/core/": "jsr:@talae/core/"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-slow-types"]
+    }
+  },
+  "test": {
+    "exclude": ["inspiration/"]
+  },
+  "tasks": {
+    "check": "deno check packages/core/mod.ts apps/backend/main.ts && deno fmt --check && deno lint",
+    "fmt": "deno fmt",
+    "lint": "deno lint",
+    "test": "deno test --allow-read --allow-env",
+    "dev:backend": "deno task --cwd apps/backend dev",
+    "dev:frontend": "deno task --cwd apps/frontend dev",
+    "finalize": "deno fmt && deno lint && deno check packages/core/mod.ts apps/backend/main.ts"
+  }
+}

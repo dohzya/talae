@@ -1,0 +1,30 @@
+{
+  "name": "@talae/backend",
+  "version": "0.1.0",
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true
+  },
+  "imports": {
+    "@talae/core": "../../packages/core/mod.ts",
+    "hono": "jsr:@hono/hono@^4",
+    "hono/": "jsr:@hono/hono@^4/"
+  },
+  "tasks": {
+    "dev": "deno run --watch --env --allow-net --allow-env --allow-read --allow-write --unstable-kv main.ts",
+    "start": "deno run --env --allow-net --allow-env --allow-read --allow-write --unstable-kv main.ts"
+  }
+}

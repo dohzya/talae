@@ -3,8 +3,6 @@
  * Use these instead of direct type assertions for better type safety and clarity.
  */
 
-/* eslint-disable @typescript-eslint/consistent-type-assertions */
-
 export const ExplicitCast = {
   /** Casts value `any` received by some libs. Prefer using .unknown() when possible. */
   fromAny: <TParam>(value: TParam) => ({
@@ -23,5 +21,3 @@ export const ExplicitCast = {
     dangerousCast: <TResult>(): TResult => value as unknown as TResult,
   }),
 };
-
-/* eslint-enable @typescript-eslint/consistent-type-assertions */
