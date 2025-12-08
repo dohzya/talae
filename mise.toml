@@ -1,2 +1,6 @@
+[settings]
+lockfile = true
+
 [tools]
 deno = "latest"
+overmind = "latest"

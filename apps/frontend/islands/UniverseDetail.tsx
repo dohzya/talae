@@ -1,5 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { useEffect } from "preact/hooks";
+import { BACKEND_URL } from "../config.ts";
 
 interface Universe {
   id: string;
@@ -50,7 +51,7 @@ export default function UniverseDetail({ universeId }: Props) {
     async function loadData() {
       try {
         const univResponse = await fetch(
-          `http://localhost:11001/api/universes/${universeId}`,
+          `${BACKEND_URL}/api/universes/${universeId}`,
         );
         if (!univResponse.ok) {
           error.value = "Universe not found";
@@ -62,7 +63,7 @@ export default function UniverseDetail({ universeId }: Props) {
         universe.value = univData;
 
         const charResponse = await fetch(
-          `http://localhost:11001/api/universe/${universeId}/characters`,
+          `${BACKEND_URL}/api/universe/${universeId}/characters`,
         );
         if (charResponse.ok) {
           characters.value = await charResponse.json();
@@ -81,7 +82,7 @@ export default function UniverseDetail({ universeId }: Props) {
   async function startConversation(characterId: string) {
     try {
       const response = await fetch(
-        `http://localhost:11001/api/universe/${universeId}/conversations`,
+        `${BACKEND_URL}/api/universe/${universeId}/conversations`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

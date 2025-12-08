@@ -1,5 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { useEffect } from "preact/hooks";
+import { BACKEND_URL } from "../config.ts";
 
 interface Universe {
   id: string;
@@ -25,7 +26,7 @@ export default function UniverseList() {
   useEffect(() => {
     async function loadUniverses() {
       try {
-        const response = await fetch("http://localhost:11001/api/universes");
+        const response = await fetch(`${BACKEND_URL}/api/universes`);
         if (!response.ok) {
           console.error("Failed to fetch universes");
           loading.value = false;
@@ -37,7 +38,7 @@ export default function UniverseList() {
         const withCounts = await Promise.all(
           data.map(async (universe) => {
             const charResponse = await fetch(
-              `http://localhost:11001/api/universe/${universe.id}/characters`,
+              `${BACKEND_URL}/api/universe/${universe.id}/characters`,
             );
             const characters = charResponse.ok ? await charResponse.json() : [];
 

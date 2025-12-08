@@ -1,0 +1,17 @@
+[[tools.deno]]
+version = "2.5.6"
+backend = "core:deno"
+"platforms.linux-arm64" = { checksum = "sha256:f5e60ae3dfceb61e5e5a41f22129e40a8bc17f6393b59e75d7ca19ceef32d824", url = "https://dl.deno.land/release/v2.5.6/deno-aarch64-unknown-linux-gnu.zip"}
+"platforms.linux-x64" = { checksum = "sha256:fd4f6abc1b6a134fa9a4dba56519f1631f44c88e04e4e3e9a8ff5975dfa66e1a", url = "https://dl.deno.land/release/v2.5.6/deno-x86_64-unknown-linux-gnu.zip"}
+"platforms.macos-arm64" = { checksum = "sha256:32a5b2bcf49432715719c7c769529269fbd08cafdc059b7cecd42f9d771059ab", url = "https://dl.deno.land/release/v2.5.6/deno-aarch64-apple-darwin.zip"}
+"platforms.macos-x64" = { checksum = "sha256:bd2a862509f930c5dee2aaef4939d6c161d833a7fec8d385d0c6e55c3136c4c2", url = "https://dl.deno.land/release/v2.5.6/deno-x86_64-apple-darwin.zip"}
+"platforms.windows-x64" = { checksum = "sha256:Algorithm", url = "https://dl.deno.land/release/v2.5.6/deno-x86_64-pc-windows-msvc.zip"}
+
+[[tools.overmind]]
+version = "2.5.1"
+backend = "github:DarthSim/overmind"
+"platforms.linux-arm64" = { url = "https://github.com/DarthSim/overmind/releases/download/v2.5.1/overmind-v2.5.1-linux-arm64.gz", url_api = "https://api.github.com/repos/DarthSim/overmind/releases/assets/158611911"}
+"platforms.linux-x64" = { url = "https://github.com/DarthSim/overmind/releases/download/v2.5.1/overmind-v2.5.1-linux-amd64.gz", url_api = "https://api.github.com/repos/DarthSim/overmind/releases/assets/158611906"}
+"platforms.macos-arm64" = { url = "https://github.com/DarthSim/overmind/releases/download/v2.5.1/overmind-v2.5.1-macos-arm64.gz", url_api = "https://api.github.com/repos/DarthSim/overmind/releases/assets/158611901"}
+"platforms.macos-x64" = { url = "https://github.com/DarthSim/overmind/releases/download/v2.5.1/overmind-v2.5.1-macos-amd64.gz", url_api = "https://api.github.com/repos/DarthSim/overmind/releases/assets/158611904"}
+"platforms.windows-x64" = { url = "https://github.com/DarthSim/overmind/releases/download/v2.5.1/overmind-v2.5.1-freebsd-amd64.gz", url_api = "https://api.github.com/repos/DarthSim/overmind/releases/assets/158611870"}

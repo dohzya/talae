@@ -196,7 +196,11 @@ for (const char of forestCharacters) {
 }
 
 console.log("\n🎉 Database seeded successfully!");
-console.log(`\nYou can now:\n- Visit http://localhost:5173/universes`);
+
+const frontendPort = Deno.env.get("PORT_FRONTEND") || "5173";
+console.log(
+  `\nYou can now:\n- Visit http://localhost:${frontendPort}/universes`,
+);
 console.log(`- Select "${space.name}" to start chatting`);
 
 Deno.exit(0);

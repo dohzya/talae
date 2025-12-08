@@ -26,7 +26,7 @@ console.log(`✓ LLM adapter initialized (${config.LLM_PROVIDER})`);
 
 const app = createApp({ db, llm });
 
-const port = Number(Deno.env.get("PORT")) || 8000;
+const port = Number(Deno.env.get("PORT_BACKEND")) || 11001;
 console.log(`\n🚀 Server running at http://localhost:${port}`);
 
 Deno.serve({ port }, app.fetch);

@@ -58,7 +58,7 @@ ollama serve
 deno task dev:backend
 ```
 
-Backend runs at `http://localhost:8000`
+Backend runs at `http://localhost:11001`
 
 ### 4. Run Frontend (in another terminal)
 
@@ -137,7 +137,7 @@ POST   /api/universe/:univId/conversations/:convId/stream (SSE)
 
 ```typescript
 const response = await fetch(
-  "http://localhost:8000/api/universe/{univId}/conversations/{convId}/stream",
+  "http://localhost:11001/api/universe/{univId}/conversations/{convId}/stream",
   {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -334,3 +334,5 @@ sections apply unchanged.
   - `deno task finalize` → fmt + lint + test + compile (run before committing)
 - CI is **blocking** on fmt/lint/check/tests.
 - Prefer permissioned tasks (named `-P` sets) in dev/test/compile.
+- **Process management**: Overmind is used to manage backend/frontend processes.
+  Use `overmind restart [backend|frontend]` to restart a specific service.
