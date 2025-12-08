@@ -16,6 +16,9 @@
       "exclude": ["no-slow-types"]
     }
   },
+  "fmt": {
+    "proseWrap": "never"
+  },
   "test": {
     "exclude": ["inspiration/"]
   },

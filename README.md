@@ -2,36 +2,29 @@
 
 **Talking Avatar in a Living Artificial Environment**
 
-A chat application where you converse with characters living in persistent
-fictional universes.
+A chat application where you converse with characters living in persistent fictional universes.
 
 ## Architecture
 
 This is a Deno monorepo with three workspace members:
 
 - **`packages/core`**: Shared domain logic, entities, ports, and services
-- **`apps/backend`**: Hono API server with Deno KV persistence and LLM
-  integration
+- **`apps/backend`**: Hono API server with Deno KV persistence and LLM integration
 - **`apps/frontend`**: Fresh 2 web UI with streaming chat interface
 
 ### Key Features
 
-- 🌍 **Persistent Universes**: Each universe has evolving state between
-  conversations
-- 💭 **Character Memory**: Characters remember interactions using salience-based
-  retrieval
+- 🌍 **Persistent Universes**: Each universe has evolving state between conversations
+- 💭 **Character Memory**: Characters remember interactions using salience-based retrieval
 - ⏱️ **Real-Time**: 1:1 time model with character availability
-- 💬 **Dialogued Conversations**: First-person character responses (no
-  narration)
+- 💬 **Dialogued Conversations**: First-person character responses (no narration)
 - 🔄 **Streaming**: SSE-based streaming for real-time character responses
-- 🎯 **Hexagonal Architecture**: Clean separation between domain, application,
-  and adapters
+- 🎯 **Hexagonal Architecture**: Clean separation between domain, application, and adapters
 
 ## Prerequisites
 
 - **Deno 2.x** (install via `mise` or [deno.land](https://deno.land))
-- **Ollama** (for local LLM): `brew install ollama` or see
-  [ollama.com](https://ollama.com)
+- **Ollama** (for local LLM): `brew install ollama` or see [ollama.com](https://ollama.com)
 - **ministral-3:8b model**: `ollama pull ministral-3:8b`
 
 ## Quick Start
@@ -58,7 +51,7 @@ ollama serve
 deno task dev:backend
 ```
 
-Backend runs at `http://localhost:11001`
+Backend runs at `http://localhost:8000`
 
 ### 4. Run Frontend (in another terminal)
 
@@ -66,23 +59,23 @@ Backend runs at `http://localhost:11001`
 deno task dev:frontend
 ```
 
-Frontend runs at `http://localhost:8080`
+Frontend runs at `http://localhost:5173`
 
 ## Configuration
 
 ### Environment Variables
 
-The app uses `.env` (committed) for defaults and `.env.local` (gitignored) for
-secrets.
+The app uses `.env` (committed) for defaults and `.env.local` (gitignored) for secrets.
 
 **Default config (`.env`):**
 
 ```bash
+PORT_BACKEND=8000
+PORT_FRONTEND=5173
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=ministral-3:8b
 LLM_PROVIDER=ollama
 DATABASE_PATH=./data/talae.db
-NODE_ENV=development
 ```
 
 **To use OpenAI instead:**
@@ -121,10 +114,11 @@ cd apps/frontend && deno task dev
 
 ## API Routes
 
-### Universe-Scoped Endpoints
+GET /api/universes GET /api/universes/:univId
 
 ```
 GET    /api/universe/:univId
+GET    /api/universe/:univId/characters
 GET    /api/universe/:univId/conversations
 POST   /api/universe/:univId/conversations
 GET    /api/universe/:univId/conversations/:convId
@@ -137,7 +131,7 @@ POST   /api/universe/:univId/conversations/:convId/stream (SSE)
 
 ```typescript
 const response = await fetch(
-  "http://localhost:11001/api/universe/{univId}/conversations/{convId}/stream",
+  "http://localhost:8000/api/universe/{univId}/conversations/{convId}/stream",
   {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -167,10 +161,10 @@ while (true) {
 .
 ├── deno.json                    # Root workspace config
 ├── .env                         # Default environment (committed)
-├── .env.example                 # Environment template
 ├── .gitignore                   # Git ignore rules
 ├── SPEC.md                      # Project specification
 ├── AGENTS.md                    # Development guidelines
+├── TODO.md                      # Feature roadmap & status
 │
 ├── packages/core/               # Shared domain logic
 │   ├── deno.jsonc
@@ -241,24 +235,7 @@ while (true) {
 
 ## Next Steps
 
-### MVP Features to Implement
-
-- [ ] User authentication & sessions
-- [ ] Universe CRUD operations
-- [ ] Character CRUD operations
-- [ ] RAG-based memory retrieval (semantic search)
-- [ ] World evolution trigger (before processing messages)
-- [ ] Character availability system
-- [ ] Offline message handling
-
-### Future Enhancements
-
-- [ ] PostgreSQL adapter for production
-- [ ] Vector database for memory (Pinecone/Weaviate)
-- [ ] Anthropic Claude adapter
-- [ ] Time acceleration modes
-- [ ] Complex character scheduling
-- [ ] Multi-character conversations
+See [TODO.md](TODO.md) for detailed feature roadmap and implementation status.
 
 ## Contributing
 
