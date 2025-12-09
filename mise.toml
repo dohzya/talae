@@ -4,3 +4,4 @@ lockfile = true
 [tools]
 deno = "latest"
 overmind = "latest"
+sd = "latest"
