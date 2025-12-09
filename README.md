@@ -65,28 +65,35 @@ Frontend runs at `http://localhost:5173`
 
 ### Environment Variables
 
-The app uses `.env` (committed) for defaults and `.env.local` (gitignored) for secrets.
+The app uses a **two-file layered config system**:
 
-**Default config (`.env`):**
+1. **`.env` (committed to git)**
+   - Single source of truth for all configuration
+   - Contains sensible defaults and inline documentation
+   - No secrets should ever be here
+   - Read by default by Deno
 
+2. **`.env.local` (git-ignored)**
+   - Only for local development overrides
+   - Contains **only the differences** from `.env` (not the full file)
+   - Layered on top of `.env` at runtime
+   - Each variable you override should have its own line
+
+**Example workflow:**
+
+`.env` has:
 ```bash
-PORT_BACKEND=8000
-PORT_FRONTEND=5173
-OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=ministral-3:8b
 LLM_PROVIDER=ollama
 DATABASE_PATH=./data/talae.db
 ```
 
-**To use OpenAI instead:**
+**Never do this:**
+- Don't copy all of `.env` to `.env.local`
+- Don't repeat values that are already correct in `.env`
+- Don't commit `.env.local` to git
 
-Create `.env.local`:
-
-```bash
-LLM_PROVIDER=openai
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
-```
+See **AGENTS.md** ("Environment Configuration" section, under "Project specificities") for architectural rationale.
 
 ## Development
 

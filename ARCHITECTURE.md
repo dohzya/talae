@@ -20,8 +20,8 @@ workspace members:
 ```
 talae/
 ├── deno.jsonc                # workspace root configuration
-├── .env                      # committed defaults (Ollama, DB path)
-├── .env.example              # environment documentation
+├── .env                      # committed defaults (all config with docs)
+├── .env.local                # local overrides (git-ignored, never commit)
 ├── data/                     # database storage (gitignored)
 │   └── talae.db             # Deno KV database
 │
@@ -261,7 +261,7 @@ EnvConfigSchema = z.object({
   OLLAMA_MODEL: z.string().default("ministral-3:8b"),
   LLM_PROVIDER: z.enum(["ollama", "openai"]).default("ollama"),
   OPENAI_API_KEY: z.string().optional(),
-  OPENAI_MODEL: z.string().optional().default("gpt-4o-mini"),
+  OPENAI_CHAT_MODEL: z.string().optional().default("gpt-5.1-nano"),
   DATABASE_PATH: z.string().optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).default(
     "development",
@@ -272,9 +272,9 @@ EnvConfigSchema = z.object({
 **Committed `.env`** with sensible defaults (no `.env.local` required for dev):
 
 ```
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=ministral-3:8b
 LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_CHAT_MODEL=ministral-3:8b
 DATABASE_PATH=data/talae.db
 NODE_ENV=development
 ```

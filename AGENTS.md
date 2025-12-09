@@ -324,7 +324,24 @@ sections apply unchanged.
     (e.g., incremental object construction).
 - Isolate unavoidable casts in tiny helpers with a one-line justification.
 
-### 2) Dev loop & CI
+### 2) Environment Configuration
+
+- **Single source of truth**: `.env` contains all configuration with defaults
+  - Documented inline (comments explain purpose and valid values)
+  - Contains sensible defaults for local development
+  - Committed to git (no secrets, ever)
+
+- **Local overrides**: `.env.local` (git-ignored)
+  - Contains **only** the differences from `.env`
+  - Not every variable needs to be here, just what you want to change
+  - Example: if `.env` has `TOKENIZER=simple` and you want `openai`, just
+    add `TOKENIZER=openai` to `.env.local`
+  - **Important**: never duplicate `.env` values in `.env.local`
+
+- **Pattern**: Deno and most tools load `.env`, then merge `.env.local` on top
+  - This means local changes are layered, not replacing entire config
+
+### 3) Dev loop & CI
 
 - Local loop tasks (declared in `deno.json(c)`):
   - `deno task fmt` → formatting

@@ -20,8 +20,8 @@ const db = await DenoKvAdapter.create(dbPath);
 console.log("✓ Database initialized");
 
 const llm = config.LLM_PROVIDER === "openai"
-  ? OpenAIAdapter.create(config.OPENAI_API_KEY!, config.OPENAI_MODEL!)
-  : OllamaAdapter.create(config.OLLAMA_BASE_URL, config.OLLAMA_MODEL);
+  ? OpenAIAdapter.create(config.OPENAI_API_KEY!, config.OPENAI_CHAT_MODEL!)
+  : OllamaAdapter.create(config.OLLAMA_BASE_URL, config.OLLAMA_CHAT_MODEL);
 console.log(`✓ LLM adapter initialized (${config.LLM_PROVIDER})`);
 
 const app = createApp({ db, llm });
