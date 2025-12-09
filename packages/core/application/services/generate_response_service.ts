@@ -1,6 +1,7 @@
 import type { DatabasePort, LLMPort } from "../ports/out/mod.ts";
 import type { Character } from "../../domain/character.ts";
 import type { Message } from "../../domain/message.ts";
+import { MemoryRetrievalService } from "./memory_retrieval_service.ts";
 
 /**
  * Service for generating character responses using LLM.
@@ -9,10 +10,16 @@ import type { Message } from "../../domain/message.ts";
 export class GenerateResponseService {
   readonly #db: DatabasePort;
   readonly #llm: LLMPort;
+  readonly #memoryRetrieval: MemoryRetrievalService;
 
-  constructor(db: DatabasePort, llm: LLMPort) {
+  constructor(
+    db: DatabasePort,
+    llm: LLMPort,
+    memoryRetrieval = new MemoryRetrievalService(),
+  ) {
     this.#db = db;
     this.#llm = llm;
+    this.#memoryRetrieval = memoryRetrieval;
   }
 
   /**
@@ -42,7 +49,14 @@ export class GenerateResponseService {
       new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
 
-    const systemPrompt = this.#buildSystemPrompt(character);
+    const systemPrompt = this.#buildSystemPrompt(
+      character,
+      this.#memoryRetrieval.findRelevantMemories(
+        character.memories,
+        sortedMessages.map((message) => message.content),
+        { limit: 8 },
+      ),
+    );
     const conversationHistory = this.#buildConversationHistory(sortedMessages);
 
     const llmMessages = [
@@ -56,11 +70,12 @@ export class GenerateResponseService {
     });
   }
 
-  #buildSystemPrompt(character: Character): string {
-    const relevantMemories = character.memories
-      .sort((a, b) => b.salience - a.salience)
-      .slice(0, 10)
-      .map((m) => `- ${m.content}`)
+  #buildSystemPrompt(
+    character: Character,
+    relevantMemories: Character["memories"],
+  ): string {
+    const formattedMemories = relevantMemories
+      .map((memory) => `- ${memory.content}`)
       .join("\n");
 
     return `You are ${character.name}.
@@ -69,7 +84,7 @@ Description: ${character.description}
 Current State: ${character.currentState}
 
 Your Memories:
-${relevantMemories || "No significant memories yet."}
+${formattedMemories || "No significant memories yet."}
 
 CRITICAL RULES:
 1. Speak ONLY in first-person dialogue. No narration, no actions in *asterisks*.
