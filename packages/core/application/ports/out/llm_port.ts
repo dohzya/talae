@@ -32,4 +32,9 @@ export interface LLMPort {
     messages: LLMMessage[],
     options?: LLMGenerateOptions,
   ): AsyncGenerator<string>;
+
+  /**
+   * Generate a vector embedding for semantic similarity operations.
+   */
+  embed(text: string): Promise<number[]>;
 }

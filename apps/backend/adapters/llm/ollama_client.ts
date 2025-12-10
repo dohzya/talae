@@ -18,6 +18,15 @@ export interface OllamaGenerateResponse {
   readonly done: boolean;
 }
 
+export interface OllamaEmbeddingRequest {
+  readonly model: string;
+  readonly prompt: string;
+}
+
+export interface OllamaEmbeddingResponse {
+  readonly embedding: number[];
+}
+
 export class OllamaClientError extends Error {
   constructor(message: string, public readonly status?: number) {
     super(message);
@@ -103,5 +112,24 @@ export class OllamaClient {
     } finally {
       reader.releaseLock();
     }
+  }
+
+  async embed(
+    request: OllamaEmbeddingRequest,
+  ): Promise<OllamaEmbeddingResponse> {
+    const response = await fetch(`${this.#baseUrl}/api/embeddings`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      throw new OllamaClientError(
+        `Ollama API error: ${response.statusText}`,
+        response.status,
+      );
+    }
+
+    return await response.json();
   }
 }

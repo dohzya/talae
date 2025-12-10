@@ -57,6 +57,14 @@ export class OllamaAdapter implements LLMPort {
     });
   }
 
+  async embed(text: string): Promise<number[]> {
+    const response = await this.#client.embed({
+      model: this.#model,
+      prompt: text,
+    });
+    return response.embedding;
+  }
+
   #messagesToPrompt(messages: LLMMessage[]): string {
     return messages
       .map((msg) => {
