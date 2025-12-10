@@ -34,6 +34,17 @@ export interface OpenAIChatStreamChunk {
   }>;
 }
 
+export interface OpenAIEmbeddingRequest {
+  readonly model: string;
+  readonly input: string;
+}
+
+export interface OpenAIEmbeddingResponse {
+  readonly data: Array<{
+    readonly embedding: number[];
+  }>;
+}
+
 export class OpenAIClientError extends Error {
   constructor(message: string, public readonly status?: number) {
     super(message);
@@ -163,6 +174,36 @@ export class OpenAIAdapter implements LLMPort {
     } finally {
       reader.releaseLock();
     }
+  }
+
+  async embed(text: string): Promise<number[]> {
+    const response = await fetch(`${this.#baseUrl}/embeddings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.#apiKey}`,
+      },
+      body: JSON.stringify(
+        {
+          model: this.#model,
+          input: text,
+        } satisfies OpenAIEmbeddingRequest,
+      ),
+    });
+
+    if (!response.ok) {
+      throw new OpenAIClientError(
+        `OpenAI API error: ${response.statusText}`,
+        response.status,
+      );
+    }
+
+    const data = await response.json() as OpenAIEmbeddingResponse;
+    const embedding = data.data[0]?.embedding;
+    if (!embedding) {
+      throw new OpenAIClientError("OpenAI returned no embedding");
+    }
+    return embedding;
   }
 
   static create(apiKey: string, model: string): OpenAIAdapter {
